@@ -8,11 +8,13 @@ var data = new FormData();
 router.get('/', function (req, res, next) {
 
     //console.log('searching for  req.query.id =' + req.query.id);
-    data.append('keywords',req.query.id);
+    data.append('reference',req.query.id);
+    data.append('action','get_reference');
+   
 
     var config = {
         method: 'post',
-        url: 'https://place-emploi-public.gouv.fr/wp-admin/admin-ajax.php?action=search_process',
+        url: 'https://place-emploi-public.gouv.fr/wp-admin/admin-ajax.php',
         headers: {
             ...data.getHeaders()
         },
@@ -21,18 +23,20 @@ router.get('/', function (req, res, next) {
 
     axios(config)
         .then(function (response) {
-            //console.log('reponse count='+response.data.count)
-            if (response.data.count) {
-                if (response.data.count == 1) {
+            //console.log('reponse data='+response.data);
+            //console.log(response.data);
+            //console.log('reponse data.url ='+response.data.url);
+            if (response.data.status = 200 ) {
+                if (response.data.message == 'Offre trouvée !') {
                     //console.log(response.data.offers[0].url);
-                    res.send('https://place-emploi-public.gouv.fr' + response.data.offers[0].url);
+                    res.send(response.data.url);
                 } else {
-                    res.send('too many offers for this id');
+                    res.send('pas d\'offre correspondante');
                 }
 
             } else {
                 //console.log('no offer :(');
-                res.send('no offer for this id');
+                res.send('Error :'+response.data.status);
             }
         })
         .catch(function (error) {
