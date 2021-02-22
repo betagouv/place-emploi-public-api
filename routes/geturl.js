@@ -7,8 +7,8 @@ var data = new FormData();
 /* GET url offer on place-emploi-public.gouv.fr with a offer id */
 router.get('/', function (req, res, next) {
 
-    console.log('searching for  req.query.id =' + req.query.id);
-    data.append('keywords', '2021-527984');
+    //console.log('searching for  req.query.id =' + req.query.id);
+    data.append('keywords',req.query.id);
 
     var config = {
         method: 'post',
@@ -36,7 +36,8 @@ router.get('/', function (req, res, next) {
             }
         })
         .catch(function (error) {
-            console.log(error);
+            //console.log(error);
+            res.send(error);
         });
 });
 
