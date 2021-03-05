@@ -4,6 +4,8 @@ var FormData = require('form-data');
 const csv = require('csv-parser');
 var axios = require('axios');
 const fs = require('fs')
+var accents = require('remove-accents');
+
 
 
 //ne devrait pas changer a moyen terme. 
@@ -128,7 +130,12 @@ router.get('/', function (req, res, next) {
     var nb_offres_export = 0;
     var nb_offres_url = 0;
     let tmp_offres_pe = [];
-    fs.createReadStream(__dirname + '/../public/offres/test-pep2pe.csv')
+    var stream = fs.createWriteStream(__dirname + '/../public/offres/'+Date.now()+'-export-pep2pe.csv');
+    stream.once('open', (fd) => {
+        stream.write("Par_URL_offre|Code_ogr|Par_ref_offre|Description|Par_cle|Par_nom|Off_experience_duree_min|Exp_cle|Exp_libelle|Dur_cle_experience|NTC_cle|TCO_cle|Off_contrat_duree_MO|Pay_cle|Off_date_creation|Off_date_modification\n");   
+       
+    });
+    fs.createReadStream(__dirname + '/../public/offres/test-pep2pe-all.csv')
         .pipe(csv({ 'separator': ';' }))
         .on('data', (data) => offresPEP.push(data))
         .on('end', () => {
@@ -149,14 +156,19 @@ router.get('/', function (req, res, next) {
 
                 console.log('offre pe Par_ref_offre============== 👉');
                
-
+                //URL = concaténation de JobDescriptionTranslation_JobTitle (avec les espaces convertis en -) + la chaine de caractère «-référence-» + OfferID
+                    //https://place-emploi-public.gouv.fr/offre-emploi/gestionnaire-sharepoint-et-serveurs-hf-reference-2021-531419/
+                    console.log('JobDescriptionTranslation_JobTitle_ = '+offresPEP[i].JobDescriptionTranslation_JobTitle_)
+                    var tmp_url = accents.remove(offresPEP[i].JobDescriptionTranslation_JobTitle_.toLowerCase().replaceAll(' ','-').replaceAll('/','').replaceAll('\'','-')).replaceAll('(', '');
+                    tmp_url = 'https://place-emploi-public.gouv.fr/offre-emploi/'+tmp_url.replaceAll(')','').replaceAll('.','').replaceAll(',','').replaceAll('«','').replaceAll('»','').replaceAll('"','')+'-reference-'+offresPEP[i].Offer_Reference_;
+                    console.log('👍 NEW URL = '+tmp_url);
 
                 console.log('Libelle_metier_pep = ' + Libelle_metier_pep);
                 var tmp_rime_rome_match = rime_rome.find(metier => metier.lib_rime == Libelle_metier_pep);
                 if (tmp_rime_rome_match) {
 
-                    offresPEP[i].JobDescriptionTranslation_Description1_ = offresPEP[i].JobDescriptionTranslation_Description1_.replace(/(?:\r\n|\r|\n)/g, '\\n');
-                    console.log( "😱"+offresPEP[i].JobDescriptionTranslation_Description1_+" > "+offresPEP[i].JobDescriptionTranslation_Description1_.length );
+                    offresPEP[i].JobDescriptionTranslation_Description1_ = offresPEP[i].JobDescriptionTranslation_Description1_.replace(/(\r\n|\n|\r)/gm, "\\n");
+                    //console.log( "😱"+offresPEP[i].JobDescriptionTranslation_Description1_+" > "+offresPEP[i].JobDescriptionTranslation_Description1_.length );
                     
                     if(offresPEP[i].JobDescriptionTranslation_Description1_.length < 50) {
                         console.log('❌ ❌ descriptif trop petit');
@@ -165,18 +177,49 @@ router.get('/', function (req, res, next) {
 
                     if(offresPEP[i].JobDescriptionTranslation_Description1_.length > 4800) {
                         console.log('🪚 on coupe a 4800 caractère le descriptif');
-                        continue;
+                        offresPEP[i].JobDescriptionTranslation_Description1_ = offresPEP[i].JobDescriptionTranslation_Description1_.substring(0,4799);
                     }
                     
-                    var data = new FormData();
 
+                    
+                   
                     nb_offres_export++;
                     console.log("✅ correspondance trouvé entre offre et code ROME I="+i); // ex : Libelle_metier_pep = RESPONSABLE ACHAT => { lib_rime: 'RESPONSABLE ACHAT', code_ogr: '12121' }
-                    //console.log(tmp_rime_rome_match.code_ogr);    
                     
+       
+                    var tmp_data_pe = {
+                        'Par_URL_offre': tmp_url,
+                        'Code_ogr': tmp_rime_rome_match.code_ogr,
+                        'Par_ref_offre': offresPEP[i].OfferID,
+                        'Description': offresPEP[i].JobDescriptionTranslation_Description1_,
+                        'Par_cle': 'PEP',
+                        'Par_nom': 'PEP',
+                        'Off_experience_duree_min': '0',
+                        'Exp_cle': 'D',
+                        'Exp_libelle': 'Debutant',
+                        'Dur_cle_experience': 'AN',
+                        'NTC_cle': 'E1',
+                        'TCO_cle': 'CDD',
+                        'Off_contrat_duree_MO': '36',
+                        'Pay_cle': '1',
+                        'Off_date_creation': '01/03/2021',
+                        'Off_date_modification': ''
+                    }
+                    tmp_offres_pe.push(tmp_data_pe);
+                    console.log('👉👉👉👉👉')
+                  
+                        stream.write(tmp_url+"|"+tmp_rime_rome_match.code_ogr+"|"+offresPEP[i].OfferID+"|"+offresPEP[i].JobDescriptionTranslation_Description1_+"|PEP|PEP|0|D|Debutant|AN|E1|CDD|36|1|01/03/2021|\n");   
+                        
+    
 
+                    nb_offres_url++;
+                    
+                    //console.log(tmp_rime_rome_match.code_ogr);    
                     //URL offre = Offer_Reference_ 
                     //console.log('Reference PEP = ' + offresPEP[i].Offer_Reference_);
+
+                    /* Je met de coté l'appel a l'api PEP pour récupérer les URL. 
+                    var data = new FormData();
                     data.append('reference', offresPEP[i].Offer_Reference_);
                     data.append('action', 'get_reference');
                     let config = {
@@ -188,6 +231,7 @@ router.get('/', function (req, res, next) {
                         ref: offresPEP[i].Offer_Reference_,
                         iteration: i,
                         code_ogr: tmp_rime_rome_match.code_ogr,
+                        description: offresPEP[i].JobDescriptionTranslation_Description1_,
                         data: data
                     };
                      axios(config)
@@ -205,7 +249,7 @@ router.get('/', function (req, res, next) {
                                     'Par_URL_offre': response.data.url,
                                     'Code_ogr': config.code_ogr,
                                     'Par_ref_offre': offresPEP[config.iteration].OfferID,
-                                    'Description': offresPEP[config.iteration].JobDescriptionTranslation_Description1_,
+                                    'Description': description,
                                     'Par_cle': 'PEP',
                                     'Par_nom': 'PEP',
                                     'Off_experience_duree_min': '0',
@@ -234,7 +278,7 @@ router.get('/', function (req, res, next) {
 
                         });
 
-
+                    */
                 } else {
                     console.log("❌ pas de correspondance trouvé entre offre et code ROME :");
                     //console.log(tmp_rime_rome_match);
@@ -244,9 +288,13 @@ router.get('/', function (req, res, next) {
 
             }
           
-            Promise.all(tmp_offres_pe).then(() => console.log(tmp_offres_pe));
+            Promise.all(tmp_offres_pe).then(() => {
+                //console.log(tmp_offres_pe);
+                console.log('écriture fichier');
+                res.send("<h1>" + offresPEP.length + " offres importes / " + nb_offres_export + " avec correspondanc RIME-ROME  (" + eval((nb_offres_export * 100) / offresPEP.length) + "%) / "+nb_offres_url+"  en ligne sur le site PEP</h1>");
+                stream.end();
+            });
 
-            res.send("<h1>" + offresPEP.length + " offres importes / " + nb_offres_export + " avec correspondanc RIME-ROME  (" + eval((nb_offres_export * 100) / offresPEP.length) + "%) / "+nb_offres_url+"  en ligne sur le site PEP</h1>");
       
         });
 
