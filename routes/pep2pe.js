@@ -6,9 +6,7 @@ var axios = require('axios');
 const fs = require('fs')
 var accents = require('remove-accents');
 
-
-
-//ne devrait pas changer a moyen terme. 
+//ne devrait pas changer a moyen terme. C'est donc, pour l'instant, en dur
 const rime_rome = [
     { lib_rime: 'CONSEILLERE/CONSEILLER EN INGENIERIE D\'ACHAT', code_ogr: '15573' },
     { lib_rime: 'RESPONSABLE ACHAT', code_ogr: '12121' },
@@ -107,91 +105,71 @@ const rime_rome = [
     { lib_rime: 'CHARGEE/ CHARGE DE RELATION ET DE SERVICE A L\'USAGER', code_ogr: '10298' },
     { lib_rime: 'CHARGEE/ CHARGE DE L\'OFFRE DE SERVICE  RELATION A L\'USAGER', code_ogr: '13877' },
     { lib_rime: 'RESPONSABLE DES ÉTUDES ET APPLICATIONS', code_ogr: '12345' }
-
-
-
 ]
-
-const header = ['OfferID', 'Offer_CreationUser_', 'Offer_CustomFields_Date1_', 'Offer_ModificationDate_', 'Offer_CustomFieldsTranslation_LongText2_',
-    'Offer_OfferID_', 'Offer_CustomFieldsTranslation_LongText1_', 'Offer_CoordLat_', 'Offer_CoordLong_', 'Offer_Reference_', 'Offer_OfferStatus_', 'JobDescription_CustomFields_CustomCodeTableValue1_',
-    'JobDescription_CustomFieldsTranslation_ShortText2_', 'JobDescription_CustomFieldsTranslation_LongText2_', 'JobDescription_CustomFieldsTranslation_LongText1_',
-    'JobDescription_CustomFieldsTranslation_LongText3_', 'JobDescriptionTranslation_Description2_', 'JobDescriptionTranslation_Description1_', 'JobDescription_PrimaryProfile_',
-    'JobDescriptionTranslation_ContractLength_', 'JobDescriptionTranslation_JobTitle_', 'JobDescription_Contract_', 'JobDescription_Country_', 'JobDescription_ProfessionalCategory_',
-    'JobDescription_SalaryRange_', 'Offer_Profile_Profile_', 'Location_JobLocation_', 'Location_CustomFieldsTranslation_ShortText1_', 'Location_GeographicalArea_GeographicalArea_',
-    'Location_Country_Country_', 'Location_Region_Region_', 'Location_Department_Department_', 'ApplicantCriteria_EducationLevel_',
-    'ApplicantCriteria_Country_', 'Offer_Specialisation_Specialisation_', 'RequiredLanguage_Language_', 'RequiredLanguage_LanguageLevel_', 'Origin_CustomFieldsTranslation_ShortText3_',
-    'Origin_BeginningDate_', 'Origin_Entity_With1', 'Origin_Entity_With2', 'Origin_Entity_With3', 'Origin_Entity_With4', 'Origin_Entity_With5', 'Origin_Entity_', 'Origin_CustomFieldsTranslation_ShortText2_', 'Origin_CustomFieldsTranslation_ShortText1_', 'Offer_BackOfficeUser_User_', 'SchedulingData_DefaultPublicationBeginDate_', 'SchedulingData_DefaultPublicationEndDate_',
-    'SchedulingData_UpdateFrequency_', 'SchedulingData_AutomaticUpdate_', 'OfferCustomBlock1_CustomFieldsTranslation_LongText1_', 'OfferCustomBlock1_CustomFields_CustomCodeTableValue3_', 'FirstPublicationDate', 'MainSupervisor']
 
 /* GET url offer on place-emploi-public.gouv.fr with a offer id */
 router.get('/', function (req, res, next) {
     var offresPEP = [];
-    var offresPE = [];
     var nb_offres_export = 0;
     var nb_offres_url = 0;
     let tmp_offres_pe = [];
-    var stream = fs.createWriteStream(__dirname + '/../public/offres/'+Date.now()+'-export-pep2pe.csv');
+    var stream = fs.createWriteStream(__dirname + '/../public/offres/' + Date.now() + '-export-pep2pe.csv');
     stream.once('open', (fd) => {
-        stream.write("Par_URL_offre|Code_ogr|Par_ref_offre|Description|Par_cle|Par_nom|Off_experience_duree_min|Exp_cle|Exp_libelle|Dur_cle_experience|NTC_cle|TCO_cle|Off_contrat_duree_MO|Pay_cle|Off_date_creation|Off_date_modification\n");   
-       
+        stream.write("Par_URL_offre|Code_ogr|Par_ref_offre|Description|Libelle_metier_OGR|Par_cle|Par_nom|Off_experience_duree_min|Exp_cle|Exp_libelle|Dur_cle_experience|NTC_cle|TCO_cle|Off_contrat_duree_MO|Pay_cle|Off_date_creation|Off_date_modification\n");
+
     });
-    fs.createReadStream(__dirname + '/../public/offres/test-pep2pe-all.csv')
+    fs.createReadStream(__dirname + '/../public/offres/export_offres_PE_all.csv')
         .pipe(csv({ 'separator': ';' }))
         .on('data', (data) => offresPEP.push(data))
         .on('end', () => {
-        
+
             console.log("🔎 Nombres de lignes importées: " + offresPEP.length);
             var i = 0;
-           
-            for ( i = 0; i < offresPEP.length; i++) {
+
+            for (i = 0; i < offresPEP.length; i++) {
 
                 //console.log(offresPEP[0]);
                 console.log("Traitement de OfferID = " + offresPEP[i].OfferID); // 527929
                 //res.send(offresPEP[i]);
-                //mise en majuscule du libellé du métier et suppréssion des parenthèses . 
+                // mise en majuscule du libellé du métier et suppréssion des parenthèses . 
                 // Responsable des études et applications (FPT - A7A/08) => RESPONSABLE DES ÉTUDES ET APPLICATIONS
                 var Libelle_metier_pep = offresPEP[i].JobDescription_PrimaryProfile_.toUpperCase().replace(/ *\([^)]*\) */g, "");
-                
-      
-
                 console.log('offre pe Par_ref_offre============== 👉');
-               
+
                 //URL = concaténation de JobDescriptionTranslation_JobTitle (avec les espaces convertis en -) + la chaine de caractère «-référence-» + OfferID
-                    //https://place-emploi-public.gouv.fr/offre-emploi/gestionnaire-sharepoint-et-serveurs-hf-reference-2021-531419/
-                    console.log('JobDescriptionTranslation_JobTitle_ = '+offresPEP[i].JobDescriptionTranslation_JobTitle_)
-                    var tmp_url = accents.remove(offresPEP[i].JobDescriptionTranslation_JobTitle_.toLowerCase().replaceAll(' ','-').replaceAll('/','').replaceAll('\'','-')).replaceAll('(', '');
-                    tmp_url = 'https://place-emploi-public.gouv.fr/offre-emploi/'+tmp_url.replaceAll(')','').replaceAll('.','').replaceAll(',','').replaceAll('«','').replaceAll('»','').replaceAll('"','')+'-reference-'+offresPEP[i].Offer_Reference_;
-                    console.log('👍 NEW URL = '+tmp_url);
+                //https://place-emploi-public.gouv.fr/offre-emploi/gestionnaire-sharepoint-et-serveurs-hf-reference-2021-531419/
+                //console.log('JobDescriptionTranslation_JobTitle_ = ' + offresPEP[i].JobDescriptionTranslation_JobTitle_);
+                var tmp_url = accents.remove(offresPEP[i].JobDescriptionTranslation_JobTitle_).toLowerCase().replaceAll(/ |\'/g, '-').replaceAll('/', '').replaceAll('|', '');
+                tmp_url = 'https://place-emploi-public.gouv.fr/offre-emploi/' + tmp_url.replaceAll(/\(|\)|\.|\,|\«|\»|\"|\°/g, '') + '-reference-' + offresPEP[i].Offer_Reference_;
+                console.log('👍 NEW URL2= ' + tmp_url);
+
 
                 console.log('Libelle_metier_pep = ' + Libelle_metier_pep);
                 var tmp_rime_rome_match = rime_rome.find(metier => metier.lib_rime == Libelle_metier_pep);
                 if (tmp_rime_rome_match) {
 
-                    offresPEP[i].JobDescriptionTranslation_Description1_ = offresPEP[i].JobDescriptionTranslation_Description1_.replace(/(\r\n|\n|\r)/gm, "\\n");
+                    offresPEP[i].JobDescriptionTranslation_Description1_ = offresPEP[i].JobDescriptionTranslation_Description1_.replace(/(\r\n|\n|\r)/gm, "\\n").replaceAll('|', '');
                     //console.log( "😱"+offresPEP[i].JobDescriptionTranslation_Description1_+" > "+offresPEP[i].JobDescriptionTranslation_Description1_.length );
-                    
-                    if(offresPEP[i].JobDescriptionTranslation_Description1_.length < 50) {
+
+                    if (offresPEP[i].JobDescriptionTranslation_Description1_.length < 50) {
                         console.log('❌ ❌ descriptif trop petit');
                         continue;
                     }
 
-                    if(offresPEP[i].JobDescriptionTranslation_Description1_.length > 4800) {
+                    if (offresPEP[i].JobDescriptionTranslation_Description1_.length > 4800) {
                         console.log('🪚 on coupe a 4800 caractère le descriptif');
-                        offresPEP[i].JobDescriptionTranslation_Description1_ = offresPEP[i].JobDescriptionTranslation_Description1_.substring(0,4799);
+                        offresPEP[i].JobDescriptionTranslation_Description1_ = offresPEP[i].JobDescriptionTranslation_Description1_.substring(0, 4799);
                     }
-                    
 
-                    
-                   
                     nb_offres_export++;
-                    console.log("✅ correspondance trouvé entre offre et code ROME I="+i); // ex : Libelle_metier_pep = RESPONSABLE ACHAT => { lib_rime: 'RESPONSABLE ACHAT', code_ogr: '12121' }
-                    
-       
+                    console.log("✅ correspondance trouvé entre offre et code ROME I=" + i); // ex : Libelle_metier_pep = RESPONSABLE ACHAT => { lib_rime: 'RESPONSABLE ACHAT', code_ogr: '12121' }
+
                     var tmp_data_pe = {
                         'Par_URL_offre': tmp_url,
                         'Code_ogr': tmp_rime_rome_match.code_ogr,
                         'Par_ref_offre': offresPEP[i].OfferID,
                         'Description': offresPEP[i].JobDescriptionTranslation_Description1_,
+                        'Libelle_metier_OGR' : offresPEP[i].JobDescriptionTranslation_JobTitle_,
                         'Par_cle': 'PEP',
                         'Par_nom': 'PEP',
                         'Off_experience_duree_min': '0',
@@ -206,14 +184,9 @@ router.get('/', function (req, res, next) {
                         'Off_date_modification': ''
                     }
                     tmp_offres_pe.push(tmp_data_pe);
-                    console.log('👉👉👉👉👉')
-                  
-                        stream.write(tmp_url+"|"+tmp_rime_rome_match.code_ogr+"|"+offresPEP[i].OfferID+"|"+offresPEP[i].JobDescriptionTranslation_Description1_+"|PEP|PEP|0|D|Debutant|AN|E1|CDD|36|1|01/03/2021|\n");   
-                        
-    
-
+                    stream.write(tmp_url.replace(/(\r\n|\n|\r)/gm, '')+"|"+tmp_rime_rome_match.code_ogr+"|" +offresPEP[i].OfferID+"|"+ offresPEP[i].JobDescriptionTranslation_Description1_.replace('|','') + "|"+offresPEP[i].JobDescriptionTranslation_JobTitle_.replace(/(\r\n|\n|\r)/gm, '')+"|PEP|PEP|0|D|Debutant|AN|E1|CDD|36|1|01/03/2021|\n");
                     nb_offres_url++;
-                    
+
                     //console.log(tmp_rime_rome_match.code_ogr);    
                     //URL offre = Offer_Reference_ 
                     //console.log('Reference PEP = ' + offresPEP[i].Offer_Reference_);
@@ -282,23 +255,17 @@ router.get('/', function (req, res, next) {
                 } else {
                     console.log("❌ pas de correspondance trouvé entre offre et code ROME :");
                     //console.log(tmp_rime_rome_match);
-
                     continue;
                 }
-
             }
-          
+
             Promise.all(tmp_offres_pe).then(() => {
                 //console.log(tmp_offres_pe);
                 console.log('écriture fichier');
-                res.send("<h1>" + offresPEP.length + " offres importes / " + nb_offres_export + " avec correspondanc RIME-ROME  (" + eval((nb_offres_export * 100) / offresPEP.length) + "%) / "+nb_offres_url+"  en ligne sur le site PEP</h1>");
+                res.send("<h1>" + offresPEP.length + " offres importées depuis PEP / " + nb_offres_export + " avec correspondanc RIME-ROME  (" + Math.round(eval((nb_offres_export * 100) / offresPEP.length)) + "%) / " + nb_offres_url + "  offres dispo pour l'import sur le site de PE</h1>");
                 stream.end();
             });
-
-      
         });
-
-
 });
 
 module.exports = router;
