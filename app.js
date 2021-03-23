@@ -8,6 +8,7 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var geturlRouter = require('./routes/geturl');
 var pep2peRouter = require('./routes/pep2pe');
+var sftpRouter = require('./routes/sftp');
 
 var app = express();
 
@@ -25,7 +26,7 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/geturl', geturlRouter);
 app.use('/pep2pe', pep2peRouter);
-
+app.use('/sftp', sftpRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
