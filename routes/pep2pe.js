@@ -132,7 +132,7 @@ router.get('/', function (req, res, next) {
     });
 
     stream.once('open', (fd) => {
-        stream.write("Par_URL_offre|Code_ogr|Par_ref_offre|Description|Libelle_metier_OGR|Par_cle|Par_nom|Off_experience_duree_min|Exp_cle|Exp_libelle|Dur_cle_experience|NTC_cle|TCO_cle|Off_contrat_duree_MO|Pay_cle|Off_date_creation|Off_date_modification\n");
+        stream.write("Par_URL_offre|Code_ogr|Par_ref_offre|Description|Libelle_metier_OGR|DEP_libelle|DEP_cle|Par_cle|Par_nom|Off_experience_duree_min|Exp_cle|Exp_libelle|Dur_cle_experience|NTC_cle|TCO_cle|Off_contrat_duree_MO|Pay_cle|Off_date_creation|Off_date_modification\n");
     });
     //fichier test = export_offres_PE_test.csv
     var talentsoft_export_file ='';
@@ -228,6 +228,19 @@ router.get('/', function (req, res, next) {
                     //console.log('Reference PEP = ' + offresPEP[i].Offer_Reference_);
 
                     // Je met de coté l'appel a l'api PEP pour récupérer les URL. 
+                    let dep_nom = '';
+                    let  dep_num =''
+                
+                    if(offresPEP[i].Location_Department_Department_ != ''){
+                  //  console.log('=====> Location_Department_Department_ = '+offresPEP[i].Location_Department_Department_);
+                  //  console.log(offresPEP[i].Location_Department_Department_.split("("));
+                   let  dep = offresPEP[i].Location_Department_Department_.split("(");
+                  //  console.log('nom ='+dep[0]+" num"+dep[1]);
+                     dep_nom = dep[0];
+                    dep_num = String(dep[1]);
+                    dep_num = dep_num.replace(')', '').replace('\'', '');
+                  //  console.log('dep_num = '+dep_num);
+                } 
                     data.append('reference', offresPEP[i].Offer_Reference_);
                     data.append('action', 'get_reference');
                     let config = {
@@ -263,6 +276,8 @@ router.get('/', function (req, res, next) {
                                     'Par_ref_offre': config.OfferID,
                                     'Description': offresPEP[config.iteration].JobDescriptionTranslation_Description1_,
                                     'Libelle_metier_OGR' : offresPEP[config.iteration].JobDescriptionTranslation_JobTitle_.replace(/(\r\n|\n|\r)/gm, ''),
+                                    'DEP_cle' : dep_num,
+                                    'DEP_libelle' : dep_nom,
                                     'Par_cle': 'PEP',
                                     'Par_nom': 'PEP',
                                     'Off_experience_duree_min': '0',
@@ -278,7 +293,7 @@ router.get('/', function (req, res, next) {
                                 }
                                 
 
-                                fs.appendFile(__dirname + '/../public/offres/' + tmp_date+ '-export-pep2pe.csv', response.data.url+"|"+config.code_ogr+"|" +config.OfferID+"|"+ offresPEP[config.iteration].JobDescriptionTranslation_Description1_+ "|"+offresPEP[config.iteration].JobDescriptionTranslation_JobTitle_.replace(/(\r\n|\n|\r)/gm, '')+"|PEP|PEP|0|D|Debutant|AN|E1|CDD|36|1|01/03/2021|\n", function (err) {
+                                fs.appendFile(__dirname + '/../public/offres/' + tmp_date+ '-export-pep2pe.csv', response.data.url+"|"+config.code_ogr+"|" +config.OfferID+"|"+ offresPEP[config.iteration].JobDescriptionTranslation_Description1_+ "|"+offresPEP[config.iteration].JobDescriptionTranslation_JobTitle_.replace(/(\r\n|\n|\r)/gm, '')+"|"+dep_nom+"|"+dep_num+"|PEP|PEP|0|D|Debutant|AN|E1|CDD|36|1|01/03/2021|\n", function (err) {
                                     if (err) throw err;
                                    /// console.log('Saved! ❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️');
                                     nb_offres_url++;
