@@ -7,15 +7,6 @@ const fs = require('fs')
 var accents = require('remove-accents');
 let export_rime_rome = require('../utils/rime_rome.js');
 
-function sleep(milliseconds) {
-    const date = Date.now();
-    let currentDate = null;
-    do {
-        currentDate = Date.now();
-    } while (currentDate - date < milliseconds);
-}
-
-
 //ne devrait pas changer a moyen terme. C'est donc, pour l'instant, en dur
 /* GET url offer on place-emploi-public.gouv.fr with a offer id */
 router.get('/', function (req, res, next) {
