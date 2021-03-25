@@ -1,20 +1,16 @@
 var express = require('express');
 var router = express.Router();
 const fs = require('fs');
-require('dotenv').config()
-var  sftp_util = require('../utils/sftp.js')
+require('dotenv').config();
 let Client = require('ssh2-sftp-client');
 
+module.exports = {
 
-
-router.get('/', function (req, res, next) {
-
+  get_file_from_pep_ts_sftp : function(remotePath, localPath){
     let sftp = new Client();
-    let remotePath = '/TestExportRecrutement/Data/test-chaib.xlsx';
-    let dst = fs.createWriteStream(__dirname + '/../public/offres/last-import-from-ts-pep.csv');
-    sftp_util.get_file_from_pep_ts_sftp(remotePath,__dirname + '/../public/offres/last-import-from-ts-pep.csv');
- 
-    /* sftp.connect({
+    let dst = fs.createWriteStream(localPath);
+     // Ex : localPath = __dirname + '/../public/offres/last-import-from-ts-pep.csv'
+    sftp.connect({
         host: process.env.SFTP_HOST,
         port: process.env.SFTP_PORT,
         username: process.env.SFTP_USER,
@@ -28,15 +24,12 @@ router.get('/', function (req, res, next) {
         return sftp.get(remotePath, dst);
       })
       .then(() => {
-          res.send('Reception du fichier ok')
+        console.log('get_file_from_pep_ts_sftp : Reception du fichier ok')
         sftp.end();
       })
       .catch(err => {
         console.error(err.message);
       });
-    */
-res.send('ok');
+}
 
-});
-
-module.exports = router;
+}

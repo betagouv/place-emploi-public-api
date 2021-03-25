@@ -3,7 +3,7 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var geturlRouter = require('./routes/geturl');
 var pep2peRouter = require('./routes/pep2pe');
-var sftpRouter = require('./routes/sftp');
+var cronRouter = require('./routes/cron');
 
 function createServer() {
 	const app = express()
@@ -13,6 +13,8 @@ function createServer() {
     app.use('/geturl', geturlRouter);
     app.use('/pep2pe', pep2peRouter);
     app.use('/sftp', sftpRouter);
+    app.use('/cron', cronRouter);
+
 
 	return app
 }
