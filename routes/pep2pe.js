@@ -83,29 +83,7 @@ router.get('/', function (req, res, next) {
                     }
 
                     nb_offres_export++;
-                    /// console.log("✅ correspondance trouvé entre offre et code ROME I=" + i); // ex : Libelle_metier_pep = RESPONSABLE ACHAT => { lib_rime: 'RESPONSABLE ACHAT', code_ogr: '12121' }
-                    /*
-                    var tmp_data_pe = {
-                        'Par_URL_offre': tmp_url,
-                        'Code_ogr': tmp_rime_rome_match.code_ogr,
-                        'Par_ref_offre': offresPEP[i].OfferID,
-                        'Description': offresPEP[i].JobDescriptionTranslation_Description1_,
-                        'Libelle_metier_OGR' : offresPEP[i].JobDescriptionTranslation_JobTitle_,
-                        'Par_cle': 'PEP',
-                        'Par_nom': 'PEP',
-                        'Off_experience_duree_min': '0',
-                        'Exp_cle': 'D',
-                        'Exp_libelle': 'Debutant',
-                        'Dur_cle_experience': 'AN',
-                        'NTC_cle': 'E1',
-                        'TCO_cle': 'CDD',
-                        'Off_contrat_duree_MO': '36',
-                        'Pay_cle': '1',
-                        'Off_date_creation': '01/03/2021',
-                        'Off_date_modification': ''
-                    }
-                    tmp_offres_pe.push(tmp_data_pe);
-                    */
+                   
 
                     let dep_nom = '';
                     let dep_num = ''
@@ -116,14 +94,8 @@ router.get('/', function (req, res, next) {
                         dep_num = String(dep[1]);
                         dep_num = dep_num.replace(')', '').replace('\'', '');
                     }
-                    data.append('reference', offresPEP[i].Offer_Reference_);
-                    data.append('action', 'get_reference');
+
                     let config = {
-                        method: 'post',
-                        url: 'https://place-emploi-public.gouv.fr/wp-admin/admin-ajax.php',
-                        headers: {
-                            ...data.getHeaders()
-                        },
                         ref: offresPEP[i].Offer_Reference_,
                         OfferID: offresPEP[i].OfferID,
                         Offer_Reference_: offresPEP[i].Offer_Reference_,
@@ -131,7 +103,6 @@ router.get('/', function (req, res, next) {
                         code_ogr: tmp_rime_rome_match.code_ogr,
                         description: offresPEP[i].JobDescriptionTranslation_Description1_,
                         backup_url: tmp_url,
-                        data: data
                     };
                     var annee   = now.getFullYear();
                     var mois    =  ("0" + (now.getMonth() + 1)).slice(-2);
@@ -141,11 +112,8 @@ router.get('/', function (req, res, next) {
                         if (err) throw err;
                         /// console.log('Saved! ❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️');
                     });
-
-                    
                 } else {
                     /// console.log("❌ pas de correspondance trouvé entre offre et code ROME :");
-
                     continue;
                 }
             }
