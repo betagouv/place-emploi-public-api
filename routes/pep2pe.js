@@ -6,6 +6,7 @@ var axios = require('axios');
 const fs = require('fs')
 var accents = require('remove-accents');
 let export_rime_rome = require('../utils/rime_rome.js');
+var now = new Date();
 
 //ne devrait pas changer a moyen terme. C'est donc, pour l'instant, en dur
 /* GET url offer on place-emploi-public.gouv.fr with a offer id */
@@ -23,7 +24,7 @@ router.get('/', function (req, res, next) {
     });
 
     stream.once('open', (fd) => {
-        stream.write("Par_URL_offre|Code_ogr|Par_ref_offre|Description|Libelle_metier_OGR|DEP_libelle|DEP_cle|Par_cle|Par_nom|Off_experience_duree_min|Exp_cle|Exp_libelle|Dur_cle_experience|NTC_cle|TCO_cle|Off_contrat_duree_MO|Pay_cle|Off_date_creation|Off_date_modification\n");
+        stream.write("Par_URL_offre|Code_OGR|Par_ref_offre|Description|Libelle_metier_OGR|DEP_libelle|DEP_cle|Par_cle|Par_nom|Off_experience_duree_min|Exp_cle|Exp_libelle|Dur_cle_experience|NTC_cle|TCO_cle|Off_contrat_duree_MO|Pay_cle|Off_date_creation|Off_date_modification\n");
     });
     //fichier test = export_offres_PE_test.csv
     var talentsoft_export_file = '';
@@ -125,56 +126,23 @@ router.get('/', function (req, res, next) {
                         },
                         ref: offresPEP[i].Offer_Reference_,
                         OfferID: offresPEP[i].OfferID,
+                        Offer_Reference_: offresPEP[i].Offer_Reference_,
                         iteration: i,
                         code_ogr: tmp_rime_rome_match.code_ogr,
                         description: offresPEP[i].JobDescriptionTranslation_Description1_,
                         backup_url: tmp_url,
                         data: data
                     };
-                    axios(config)
-                        .then(function (response) {
+                    var annee   = now.getFullYear();
+                    var mois    =  ("0" + (now.getMonth() + 1)).slice(-2);
+                    var jour    = now.getDate();
+                    nb_offres_url++;
+                    fs.appendFile(__dirname + '/../public/offres/' + tmp_date + '-export-pep2pe.csv', "https://place-emploi-public.gouv.fr/offre-emploi/"+config.Offer_Reference_ + "|" + config.code_ogr + "|" + config.OfferID + "|" + offresPEP[config.iteration].JobDescriptionTranslation_Description1_ + "|" + offresPEP[config.iteration].JobDescriptionTranslation_JobTitle_.replace(/(\r\n|\n|\r)/gm, '') + "|" + dep_nom + "|" + dep_num + "|PEP|PEP|0|D|Debutant|AN|E1|CDD|36|1|"+jour+"/"+mois+"/"+annee+"|\n", function (err) {
+                        if (err) throw err;
+                        /// console.log('Saved! ❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️');
+                    });
 
-                            if (response.data.message == 'Offre trouvée !') {
-                                // On a bien un url sur le front PEP : l'offre est publié et dispo
-                                var offre_pep_url = response.data.url;
-                                ///console.log('✅ ✅  URL trouvé'+response.data.url+" I ="+config.iteration+ "et code ogr="+config.code_ogr+ " et ref="+config.ref);
-
-                                var tmp_data_pe = {
-                                    'Par_URL_offre': response.data.url,
-                                    'Code_ogr': config.code_ogr,
-                                    'Par_ref_offre': config.OfferID,
-                                    'Description': offresPEP[config.iteration].JobDescriptionTranslation_Description1_,
-                                    'Libelle_metier_OGR': offresPEP[config.iteration].JobDescriptionTranslation_JobTitle_.replace(/(\r\n|\n|\r)/gm, ''),
-                                    'DEP_cle': dep_num,
-                                    'DEP_libelle': dep_nom,
-                                    'Par_cle': 'PEP',
-                                    'Par_nom': 'PEP',
-                                    'Off_experience_duree_min': '0',
-                                    'Exp_cle': 'D',
-                                    'Exp_libelle': 'Debutant',
-                                    'Dur_cle_experience': 'AN',
-                                    'NTC_cle': 'E1',
-                                    'TCO_cle': 'CDD',
-                                    'Off_contrat_duree_MO': '36',
-                                    'Pay_cle': '1',
-                                    'Off_date_creation': '16/03/2021',
-                                    'Off_date_modification': ''
-                                }
-
-                                fs.appendFile(__dirname + '/../public/offres/' + tmp_date + '-export-pep2pe.csv', response.data.url + "|" + config.code_ogr + "|" + config.OfferID + "|" + offresPEP[config.iteration].JobDescriptionTranslation_Description1_ + "|" + offresPEP[config.iteration].JobDescriptionTranslation_JobTitle_.replace(/(\r\n|\n|\r)/gm, '') + "|" + dep_nom + "|" + dep_num + "|PEP|PEP|0|D|Debutant|AN|E1|CDD|36|1|01/03/2021|\n", function (err) {
-                                    if (err) throw err;
-                                    /// console.log('Saved! ❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️');
-                                    nb_offres_url++;
-                                    tmp_offres_pe.push(tmp_data_pe);
-
-                                });
-
-                            } else {
-                                /// console.log('❌❌❌ pas d\'URL dans le front PEP pour cette offre');                               
-                            }
-                        })
-                        .catch(function (error) {
-                        });
+                    
                 } else {
                     /// console.log("❌ pas de correspondance trouvé entre offre et code ROME :");
 
@@ -182,12 +150,11 @@ router.get('/', function (req, res, next) {
                 }
             }
 
-            Promise.all(tmp_offres_pe).then(() => {
-
+           
                 /// console.log('écriture fichier');
                 res.send("<h1>" + offresPEP.length + " offres importées depuis PEP / " + nb_offres_export + " avec correspondanc RIME-ROME  (" + Math.round(eval((nb_offres_export * 100) / offresPEP.length)) + "%) / " + nb_offres_url + "  offres dispo pour l'import sur le site de PE</h1>");
                 stream.end();
-            });
+        
         });
 });
 
