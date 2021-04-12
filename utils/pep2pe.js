@@ -33,8 +33,9 @@ module.exports = {
         talentsoft_export_file = pepfile;
     }
     else {
-        talentsoft_export_file = 'Offres_PE_20210406.csv'
+        talentsoft_export_file = 'last-import-from-ts-pep.csv'; //'export_offres_PEP_07avril2021.csv'
     }
+    console.log('[pep2pe] : import du fichier :'+talentsoft_export_file);
     fs.createReadStream(__dirname + '/../public/offres/' + talentsoft_export_file)
         .on('error', function (err) {
             //res.status(500);
@@ -47,7 +48,7 @@ module.exports = {
         .on('data', (data) => offresPEP.push(data))
         .on('end', () => {
 
-             console.log("🔎 Nombres de lignes importées: " + offresPEP.length);
+            console.log("🔎 Nombres de lignes importées: " + offresPEP.length);
             var i = 0;
 
             for (i = 0; i < offresPEP.length; i++) {
@@ -68,7 +69,7 @@ module.exports = {
                 /// console.log('👍 NEW URL2= ' + tmp_url);
 
 
-             console.log('Libelle_metier_pep = ' + Libelle_metier_pep);
+             //console.log('Libelle_metier_pep = ' + Libelle_metier_pep);
 
                 var tmp_rime_rome_match = export_rime_rome.rime_rome.find(metier => metier.lib_rime == Libelle_metier_pep);
                 if (tmp_rime_rome_match) {
@@ -77,7 +78,7 @@ module.exports = {
                     //console.log( "😱"+offresPEP[i].JobDescriptionTranslation_Description1_+" > "+offresPEP[i].JobDescriptionTranslation_Description1_.length );
 
                     if (offresPEP[i].JobDescriptionTranslation_Description1_.length < 50) {
-                         console.log('❌ ❌ descriptif trop petit');
+                         //console.log('❌ ❌ descriptif trop petit');
                         continue;
                     }
 
@@ -109,10 +110,11 @@ module.exports = {
                         code_ogr: tmp_rime_rome_match.code_ogr,
                         description: offresPEP[i].JobDescriptionTranslation_Description1_                    
                     };
-                        console.log(offresPEP[i]);
+                        //console.log(offresPEP[i]);
                     var annee   = now.getFullYear();
                     var mois    =  ("0" + (now.getMonth() + 1)).slice(-2);
-                    var jour    = now.getDate();
+                    var jour    = ('0' + now.getDate()).slice(-2) ; 
+                    //console.log('jour =>'+jour+'')
                     nb_offres_url++;
                     fs.appendFile(__dirname + '/../public/offres/' + tmp_date + '-export-pep2pe.csv', "https://place-emploi-public.gouv.fr/offre-emploi/"+config.Offer_Reference_ + "|" + config.code_ogr + "|" + config.OfferID + "|" + offresPEP[config.iteration].JobDescriptionTranslation_Description1_ + "|" + offresPEP[config.iteration].JobDescriptionTranslation_JobTitle_.replace(/(\r\n|\n|\r)/gm, '') + "|" + dep_nom + "|" + dep_num + "|PEP|PEP|0|D|Debutant|AN|E1|CDD|36|1|"+jour+"/"+mois+"/"+annee+"|\n", function (err) {
                         if (err) throw err;

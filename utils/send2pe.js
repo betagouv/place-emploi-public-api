@@ -1,6 +1,5 @@
 var express = require('express');
 var router = express.Router();
-const fs = require('fs');
 var request = require('request');
 require('dotenv').config();
 
@@ -17,7 +16,7 @@ module.exports = {
               'login': process.env.PE_LOGIN,
               'password':  process.env.PE_PWD,
               'nomFlux': process.env.PE_NOM_FLUX,
-              'fichierAenvoyer': filetosend,
+              'fichierAenvoyer': 'toto'+filetosend,
               'periodeRef': ' '
             }
           };

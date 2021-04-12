@@ -1,8 +1,6 @@
 var express = require('express');
 var router = express.Router();
-
-
-var  pep2pe = require('../utils/pep2pe.js')
+var  pep2pe = require('../utils/pep2pe.js');
 
 
 //ne devrait pas changer a moyen terme. C'est donc, pour l'instant, en dur

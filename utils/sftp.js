@@ -6,7 +6,7 @@ let Client = require('ssh2-sftp-client');
 
 module.exports = {
 
-  get_file_from_pep_ts_sftp : function(remotePath, localPath){
+  get_file_from_pep_ts_sftp : function(remotePath,remotePathBackup, localPath){
     let sftp = new Client();
     let dst = fs.createWriteStream(localPath);
      // Ex : localPath = __dirname + '/../public/offres/last-import-from-ts-pep.csv'
@@ -24,11 +24,17 @@ module.exports = {
         return sftp.get(remotePath, dst);
       })
       .then(() => {
-        console.log('get_file_from_pep_ts_sftp : Reception du fichier ok')
+        //console.log('get_file_from_pep_ts_sftp : Reception du fichier ok');
         sftp.end();
       })
       .catch(err => {
         console.error(err.message);
+        //console.log('get_file_from_pep_ts_sftp : Reception du fichier ko. Tenative de récuperation de fichier de la veille ='+remotePathBackup);
+        sftp.get(remotePathBackup, dst).then(() => {
+          //console.log('get_file_from_pep_ts_sftp : Reception du fichier de BACKUP ok');
+          sftp.end();
+        });
+
       });
 }
 
