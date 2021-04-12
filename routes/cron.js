@@ -65,9 +65,15 @@ router.get('/', function (req, res, next) {
     let remotePath = '/ExportRecrutement/Data/'+ts_file;
     let remotePathBackup = '/ExportRecrutement/Data/Offres_PE_'+yesterday+'.csv';
     /// let dst = fs.createWriteStream(__dirname + '/../public/offres/last-import-from-ts-pep.csv');
-    sftp_util.get_file_from_pep_ts_sftp(remotePath,remotePathBackup,__dirname + '/../public/offres/last-import-from-ts-pep.csv');
+    sftp_util.get_file_from_pep_ts_sftp(remotePath,remotePathBackup,__dirname + '/../public/offres/last-import-from-ts-pep.csv',function(callback) {
+      console.log('resultat de pep2pe = '+callback);
+      notifmsg =   callback;
+      sendnotif('Import de l\'export TS',notifmsg);
+
+
+    });
     ///TestExportRecrutement/Data/Offres_PE_20210406.csv
-    notifmsg = 'récupération du fichier '+remotePath;
+    
 
       }, null, true, 'Europe/Paris');
 
