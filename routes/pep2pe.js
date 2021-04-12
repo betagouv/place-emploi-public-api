@@ -7,7 +7,7 @@ var  pep2pe = require('../utils/pep2pe.js');
 /* GET url offer on place-emploi-public.gouv.fr with a offer id */
 router.get('/', function (req, res, next) {
   
-   var tmp = pep2pe.pep2pe();
+   var tmp = pep2pe.pep2pe(req.query.file);
     console.log(tmp);
     res.send(tmp);
 });

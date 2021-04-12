@@ -11,7 +11,7 @@ var now = new Date();
 
 module.exports = {
 
-  pep2pe : function(pepfile, pefile){
+  pep2pe : function(pepfile, pefile,callback){
 
     var offresPEP = [];
     var nb_offres_export = 0;
@@ -39,6 +39,7 @@ module.exports = {
     fs.createReadStream(__dirname + '/../public/offres/' + talentsoft_export_file)
         .on('error', function (err) {
             //res.status(500);
+            if(callback) callback(err);
             return err;
         })
         .pipe(csv({ 'separator': ';' ,'escape' : '"'}))
@@ -117,7 +118,9 @@ module.exports = {
                     //console.log('jour =>'+jour+'')
                     nb_offres_url++;
                     fs.appendFile(__dirname + '/../public/offres/' + tmp_date + '-export-pep2pe.csv', "https://place-emploi-public.gouv.fr/offre-emploi/"+config.Offer_Reference_ + "|" + config.code_ogr + "|" + config.OfferID + "|" + offresPEP[config.iteration].JobDescriptionTranslation_Description1_ + "|" + offresPEP[config.iteration].JobDescriptionTranslation_JobTitle_.replace(/(\r\n|\n|\r)/gm, '') + "|" + dep_nom + "|" + dep_num + "|PEP|PEP|0|D|Debutant|AN|E1|CDD|36|1|"+jour+"/"+mois+"/"+annee+"|\n", function (err) {
-                        if (err) throw err;
+                        if (err) {
+                            throw err;
+                            if(callback) callback(err);}
                         /// console.log('Saved! ❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️❤️');
                     });
                 } else {
@@ -130,6 +133,7 @@ module.exports = {
                 /// console.log('écriture fichier');
               //  res.send("<h1>" + offresPEP.length + " offres importées depuis PEP / " + nb_offres_export + " avec correspondanc RIME-ROME  (" + Math.round(eval((nb_offres_export * 100) / offresPEP.length)) + "%) / " + nb_offres_url + "  offres dispo pour l'import sur le site de PE</h1>");
               stream.end();
+              if(callback) callback( "<h1>" + offresPEP.length + " offres importées depuis PEP / " + nb_offres_export + " avec correspondanc RIME-ROME  (" + Math.round(eval((nb_offres_export * 100) / offresPEP.length)) + "%) / " + nb_offres_url + "  offres dispo pour l'import sur le site de PE</h1>");
               return   "<h1>" + offresPEP.length + " offres importées depuis PEP / " + nb_offres_export + " avec correspondanc RIME-ROME  (" + Math.round(eval((nb_offres_export * 100) / offresPEP.length)) + "%) / " + nb_offres_url + "  offres dispo pour l'import sur le site de PE</h1>";
 
         });

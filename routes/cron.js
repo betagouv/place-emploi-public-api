@@ -10,7 +10,7 @@ require('dotenv').config();
 
 //send2pe
 
-async function sendnotif(msg) {
+async function sendnotif(objet, msg) {
   // Generate test SMTP service account from ethereal.email
   // Only needed if you don't have a real mail account for testing
   let testAccount = await nodemailer.createTestAccount();
@@ -30,7 +30,7 @@ async function sendnotif(msg) {
   let info = await transporter.sendMail({
     from: '"Chaib Martinez" <chaib.martinez@beta.gouv.fr>', // sender address
     to: "chaib@close-more.deals", // list of receivers ex :   to: "chaib@example.com, baz@example.com", 
-    subject: "Pep2Pe notification", // Subject line
+    subject: objet, // Subject line
     text: msg, // plain text body
     html: msg, // html body
   });
@@ -71,12 +71,15 @@ router.get('/', function (req, res, next) {
 
       }, null, true, 'Europe/Paris');
 
-      var pepconversionpe = new CronJob('0 */3 * * * *', function() {
+      var pepconversionpe = new CronJob('0 1-59/2 * * * *', function() {
 
         console.log('👉 job2 pepconversionpe '+Date());
-        var tmp = pep2pe.pep2pe();
-        console.log(tmp);
-        notifmsg =   notifmsg + tmp;
+        var tmp = pep2pe.pep2pe('','',function(callback) {
+          console.log('resultat de pep2pe = '+callback);
+          notifmsg =   callback;
+          sendnotif('PEP2PE : import depuis TS',notifmsg);
+
+        });
 
       }, null, true, 'Europe/Paris');
 
@@ -91,6 +94,7 @@ router.get('/', function (req, res, next) {
 */
 
       get_ts_file.start();
+      pepconversionpe.start();
       
 
 
