@@ -3,12 +3,9 @@ var router = express.Router();
 var request = require('request');
 require('dotenv').config();
 
-
 module.exports = {
-
-    send2pe : function(){
-        let filetosend = __dirname + '/../public/offres/last-import-from-ts-pep.csv';
-
+    send2pe : function(callback){
+        let filetosend = __dirname + '/../public/offres/last-export-to-pe.csv';
         var options = {
             'method': 'POST',
             'url': process.env.PE_SUBMIT_URL,
@@ -16,16 +13,18 @@ module.exports = {
               'login': process.env.PE_LOGIN,
               'password':  process.env.PE_PWD,
               'nomFlux': process.env.PE_NOM_FLUX,
-              'fichierAenvoyer': 'toto'+filetosend,
+              'fichierAenvoyer': '@'+filetosend, //'toto'=> @
               'periodeRef': ' '
             }
           };
           request(options, function (error, response) {
-            if (error) throw new Error(error);
+            if (error) {
+              if(callback) callback(error);
+              throw new Error(error);
+            }
+            if(callback) callback(response.body);
             console.log(response.body);
           });
-          
-
 
   }
   

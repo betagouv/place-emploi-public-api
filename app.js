@@ -10,6 +10,7 @@ var geturlRouter = require('./routes/geturl');
 var pep2peRouter = require('./routes/pep2pe');
 var sftpRouter = require('./routes/sftp');
 var cronRouter = require('./routes/cron');
+var send2peRouter = require('./routes/send2pe');
 
 
 var app = express();
@@ -30,6 +31,7 @@ app.use('/geturl', geturlRouter);
 app.use('/pep2pe', pep2peRouter);
 app.use('/sftp', sftpRouter);
 app.use('/cron', cronRouter);
+app.use('/send2pe', send2peRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
