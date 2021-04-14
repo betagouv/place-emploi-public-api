@@ -52,7 +52,7 @@ router.get('/', function (req, res, next) {
   // Chaque minute     var job = new CronJob('0 */1 * * * *', function() {
   // Chaque 10 minutes     var job = new CronJob('0 */10 * * * *', function() {
   // Chaque seconde     var job = new CronJob('0 */1 * * * *', function() {
-    var get_ts_file = new CronJob('0 */2 * * * *', function () {
+    var get_ts_file = new CronJob('00 30 04 * * 0-6', function () {
     console.log('job1' + Date());
     let start = new Date();
     let yesterday = new Date();
@@ -76,7 +76,7 @@ router.get('/', function (req, res, next) {
 
   }, null, true, 'Europe/Paris');
 
-  var pepconversionpe = new CronJob('0 1-59/2 * * * *', function () {
+  var pepconversionpe = new CronJob('00 30 08 * * 0-6', function () {
     console.log('👉 job2 pepconversionpe ' + Date());
     var tmp = pep2pe.pep2pe('', '', function (callback) {
       console.log('resultat de pep2pe = ' + callback);
@@ -85,7 +85,7 @@ router.get('/', function (req, res, next) {
     });
   }, null, true, 'Europe/Paris');
 
-  var sendtopeandnotif = new CronJob('*/50 * * * * *', function () {
+  var sendtopeandnotif = new CronJob('00 01 11 * * 0-6', function () {
     console.log('job3 sendtopeandnotif' + Date());
     var tmp = send2pe.send2pe(function (callback) {
       console.log('resultat de pep2pe = ' + callback);
