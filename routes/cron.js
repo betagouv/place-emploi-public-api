@@ -85,7 +85,7 @@ router.get('/', function (req, res, next) {
     });
   }, null, true, 'Europe/Paris');
 
-  var sendtopeandnotif = new CronJob('00 01 11 * * 0-6', function () {
+  var sendtopeandnotif = new CronJob('00 15 11 * * 0-6', function () {
     console.log('job3 sendtopeandnotif' + Date());
     var tmp = send2pe.send2pe(function (callback) {
       console.log('resultat de pep2pe = ' + callback);
