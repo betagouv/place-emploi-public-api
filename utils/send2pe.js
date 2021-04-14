@@ -17,7 +17,6 @@ module.exports = {
               'nomFlux': process.env.PE_NOM_FLUX,
               'fichierAenvoyer': fs.createReadStream(filetosend), //'toto'=> @
               'periodeRef': ' '
-             
             }
           };
           request(options, function (error, response) {
