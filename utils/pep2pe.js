@@ -10,7 +10,10 @@ var now = new Date();
 
 
 module.exports = {
-
+//pep2pe prend en entré un fichier d'export d'offre de pep au format talentsoft
+//ensuite, on ne prend que les offres qui sont dans le référentiel rime_rome (/rime_rome.js)
+//on supprimer les offres qui on un descriptif trop court, etc
+//ensuite il le converti dans un format "pole emploi"
   pep2pe : function(pepfile, pefile,callback){
 
     var offresPEP = [];

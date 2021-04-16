@@ -1,4 +1,6 @@
-
+//selection de métier qui seront envoyés sur le site de pôle emploi.
+//un metier (lib_rime) absent de ce fichier ne sera jamais envoyé sur pôle emploi
+//pour ajouter un métlier, il faut connaitre le libélé rime exact, et le code rom (code_ogr) associé a ce fichier
  exports.rime_rome = [
     { lib_rime: 'CONSEILLERE/CONSEILLER EN INGENIERIE D\'ACHAT', code_ogr: '15573' },
     { lib_rime: 'RESPONSABLE ACHAT', code_ogr: '12121' },

@@ -5,7 +5,9 @@ require('dotenv').config();
 let Client = require('ssh2-sftp-client');
 
 module.exports = {
-
+// get_file_from_pep_ts_sftp permet de récupérer le fichier d'export de toute les offres publiées présentes sur Talentsoft, et donc sur le site 
+// https://place-emploi-public.gouv.fr/ 
+// ce fichier est déposé apres minuit normalement. En cas d'absence, on essai de récupérer l'export de la veille.
   get_file_from_pep_ts_sftp : function(remotePath,remotePathBackup, localPath,callback){
     let sftp = new Client();
     let dst = fs.createWriteStream(localPath);

@@ -5,6 +5,10 @@ require('dotenv').config();
 const fs = require('fs');
 
 module.exports = {
+
+  //envoi du fichier des offres pep au format pôle emploi sur les serveur de pole emploi
+  //on peut juste savoir en retour si le fichier a été accepté ou pas
+  //impossible d'avoir un reotur plus précis, car le traitement est réalisé plustard chez eux 
     send2pe : function(callback){
         let filetosend = __dirname + '/../public/offres/last-export-to-pe.csv';
         console.log('sending '+filetosend);

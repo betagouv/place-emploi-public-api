@@ -7,27 +7,26 @@ var pep2pe = require('../utils/pep2pe.js');
 const nodemailer = require("nodemailer");
 require('dotenv').config();
 
-
-//send2pe
-
+// Récupération le matin à 04h30 du fichier des exports des offres Talentsoft
+// Traitement du fichier Talentsoft à 08h30, création du fichier des offres ) envoyer à Pole emploi
+// Envoi du fichier à Pôle emploi à 11h01
+console.log('cron running...')
 async function sendnotif(objet, msg) {
-  // Generate test SMTP service account from ethereal.email
-  // Only needed if you don't have a real mail account for testing
+  
   let testAccount = await nodemailer.createTestAccount();
-  // create reusable transporter object using the default SMTP transport
   let transporter = nodemailer.createTransport({
     host: process.env.SMTP_SERVEUR,
     port: process.env.SMTP_PORT,
-    secure: false, // true for 465, false for other ports
+    secure: false, 
     auth: {
-      user: process.env.SMTP_USER, // generated ethereal user
-      pass: process.env.SMTP_KEY // generated ethereal password
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_KEY 
     },
   });
 
-  // send mail with defined transport object
+
   let info = await transporter.sendMail({
-    from: '"Chaib Martinez" <chaib.martinez@beta.gouv.fr>', // sender address
+    from: '"Chaib Martinez" <chaib.martinez@beta.gouv.fr>', 
     to: "chaib@close-more.deals", // list of receivers ex :   to: "chaib@example.com, baz@example.com", 
     subject: objet, // Subject line
     text: msg, // plain text body
@@ -36,22 +35,12 @@ async function sendnotif(objet, msg) {
 
   console.log("Message sent: %s", info.messageId);
   // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
-
-  // Preview only available when sending through an Ethereal account
-  console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
-  // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
 }
 
 
 router.get('/', function (req, res, next) {
   var notifmsg = '';
 
-
-
-
-  // Chaque minute     var job = new CronJob('0 */1 * * * *', function() {
-  // Chaque 10 minutes     var job = new CronJob('0 */10 * * * *', function() {
-  // Chaque seconde     var job = new CronJob('0 */1 * * * *', function() {
     var get_ts_file = new CronJob('00 30 04 * * 0-6', function () {
     console.log('job1' + Date());
     let start = new Date();
@@ -71,8 +60,6 @@ router.get('/', function (req, res, next) {
       notifmsg = callback;
       sendnotif('Import de l\'export TS', notifmsg);
     });
-    ///TestExportRecrutement/Data/Offres_PE_20210406.csv
-
 
   }, null, true, 'Europe/Paris');
 
@@ -85,7 +72,7 @@ router.get('/', function (req, res, next) {
     });
   }, null, true, 'Europe/Paris');
 
-  var sendtopeandnotif = new CronJob('00 15 11 * * 0-6', function () {
+  var sendtopeandnotif = new CronJob('00 01 11 * * 0-6', function () {
     console.log('job3 sendtopeandnotif' + Date());
     var tmp = send2pe.send2pe(function (callback) {
       console.log('resultat de pep2pe = ' + callback);
