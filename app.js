@@ -32,6 +32,7 @@ app.use('/pep2pe', pep2peRouter);
 app.use('/sftp', sftpRouter);
 app.use('/cron', cronRouter);
 app.use('/send2pe', send2peRouter);
+app.use("/public", express.static(path.join(__dirname, 'public')));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
