@@ -7,7 +7,7 @@
     "node": ">=15.0.0"
   },
   "scripts": {
-    "start": "node ./bin/www ./routes/cron.js",
+    "start": "node ./bin/www app.js ./routes/cron.js",
     "test": "jest --detectOpenHandles"
   },
   "jest": {
