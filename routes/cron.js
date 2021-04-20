@@ -10,7 +10,7 @@ require('dotenv').config();
 // Récupération le matin à 04h30 du fichier des exports des offres Talentsoft
 // Traitement du fichier Talentsoft à 08h30, création du fichier des offres ) envoyer à Pole emploi
 // Envoi du fichier à Pôle emploi à 11h01
-console.log('cron running...')
+console.log('cron running...  ')
 async function sendnotif(objet, msg) {
   
   let testAccount = await nodemailer.createTestAccount();
@@ -86,7 +86,7 @@ router.get('/', function (req, res, next) {
   get_ts_file.start();
   pepconversionpe.start();
   sendtopeandnotif.start();
-  res.send('Job running ...');
+  res.send('Job is running');
 
 
 });
