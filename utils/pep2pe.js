@@ -29,7 +29,7 @@ module.exports = {
     });
 
     stream.once('open', (fd) => {
-        stream.write("Par_URL_offre|Code_OGR|Par_ref_offre|Description|Libelle_metier_OGR|DEP_libelle|DEP_cle|Par_cle|Par_nom|Off_experience_duree_min|Exp_cle|Exp_libelle|Dur_cle_experience|NTC_cle|TCO_cle|Off_contrat_duree_MO|Pay_cle|Off_date_creation|Off_date_modification\n");
+        stream.write("Par_URL_offre|Code_OGR|Par_ref_offre|Description|Libelle_metier_OGR|DEP_libelle|DEP_cle|Description_entreprise|Par_cle|Par_nom|Off_experience_duree_min|Exp_cle|Exp_libelle|Dur_cle_experience|NTC_cle|TCO_cle|Off_contrat_duree_MO|Pay_cle|Off_date_creation|Off_date_modification\n");
     });
     //fichier test = export_offres_PE_test.csv
     var talentsoft_export_file = '';
@@ -113,15 +113,25 @@ module.exports = {
                         Offer_Reference_: offresPEP[i].Offer_Reference_,
                         iteration: i,
                         code_ogr: tmp_rime_rome_match.code_ogr,
-                        description: offresPEP[i].JobDescriptionTranslation_Description1_                    
+                        description: offresPEP[i].JobDescriptionTranslation_Description1_,
+                        Description_entreprise :  offresPEP[i].Origin_Entity_                   
                     };
                         //console.log(offresPEP[i]);
+                        let experience = 1;
+                        let exp_cle = 'E';
+                        let exp_libelle = 'Expérience exigée';
+                        if(offresPEP[i].ApplicantCriteria_ExperienceLevel_ == 'Débutant') {
+                            experience = 0;
+                            exp_cle = 'D';
+                            exp_libelle = 'Debutant';
+                        } 
+
                     var annee   = now.getFullYear();
                     var mois    =  ("0" + (now.getMonth() + 1)).slice(-2);
                     var jour    = ('0' + now.getDate()).slice(-2) ; 
                     //console.log('jour =>'+jour+'')
                     nb_offres_url++;
-                    fs.appendFile(__dirname + '/../public/offres/last-export-to-pe.csv', "https://place-emploi-public.gouv.fr/offre-emploi/"+config.Offer_Reference_ + "|" + config.code_ogr + "|" + config.OfferID + "|" + offresPEP[config.iteration].JobDescriptionTranslation_Description1_ + "|" + offresPEP[config.iteration].JobDescriptionTranslation_JobTitle_.replace(/(\r\n|\n|\r)/gm, '') + "|" + dep_nom + "|" + dep_num + "|PEP|PEP|0|D|Debutant|AN|E1|CDD|36|1|"+jour+"/"+mois+"/"+annee+"|\n", function (err) {
+                    fs.appendFile(__dirname + '/../public/offres/last-export-to-pe.csv', "https://place-emploi-public.gouv.fr/offre-emploi/"+config.Offer_Reference_ + "|" + config.code_ogr + "|" + config.OfferID + "|" + offresPEP[config.iteration].JobDescriptionTranslation_Description1_ + "|" + offresPEP[config.iteration].JobDescriptionTranslation_JobTitle_.replace(/(\r\n|\n|\r)/gm, '') + "|" + dep_nom + "|" + dep_num + "|"+config.Description_entreprise+"|PEP|PEP|"+experience+"|"+exp_cle+"|"+exp_libelle+"|AN|E1|CDD|36|1|"+jour+"/"+mois+"/"+annee+"|\n", function (err) {
                         if (err) {
                             throw err;
                             if(callback) callback(err);}
