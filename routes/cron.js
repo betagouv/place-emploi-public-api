@@ -27,7 +27,7 @@ async function sendnotif(objet, msg) {
 
   let info = await transporter.sendMail({
     from: '"Chaib Martinez" <chaib.martinez@beta.gouv.fr>', 
-    to: "chaib@close-more.deals, pep-flux-apiftp@finances.finances.gouv.fr", // list of receivers ex :   to: "chaib@example.com, baz@example.com", 
+    to: "chaib@close-more.deals, pep-flux-apiftp@finances.gouv.fr", // list of receivers ex :   to: "chaib@example.com, baz@example.com", 
     subject: objet, // Subject line
     text: msg, // plain text body
     html: msg, // html body
