@@ -61,7 +61,10 @@ module.exports = {
                 /// console.log("Traitement de OfferID = " + offresPEP[i].OfferID); // 527929
                 // mise en majuscule du libellé du métier et suppréssion des parenthèses . 
                 // Responsable des études et applications (FPT - A7A/08) => RESPONSABLE DES ÉTUDES ET APPLICATIONS
-                var Libelle_metier_pep = offresPEP[i].JobDescription_PrimaryProfile_.toUpperCase().replace(/ *\([^)]*\) */g, "");
+
+                var Libelle_metier_pep = '';
+                if(offresPEP[i].JobDescription_PrimaryProfile_){
+                    Libelle_metier_pep = offresPEP[i].JobDescription_PrimaryProfile_.toUpperCase().replace(/ *\([^)]*\) */g, "");}
                 ///  console.log('offre pe Par_ref_offre============== 👉');
              //console.log('Libelle_metier_pep = ' + Libelle_metier_pep);
 
