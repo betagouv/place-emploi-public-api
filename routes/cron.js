@@ -27,7 +27,7 @@ async function sendnotif(objet, msg) {
 
   let info = await transporter.sendMail({
     from: '"Chaib Martinez" <chaib.martinez@beta.gouv.fr>', 
-    to: "chaib@close-more.deals, pep-flux-apiftp@finances.gouv.fr", // list of receivers ex :   to: "chaib@example.com, baz@example.com", 
+    to: "chaib.martinez@beta.gouv.fr, pep-flux-apiftp@finances.gouv.fr", // list of receivers ex :   to: "xxxxx@example.com, baz@example.com", 
     subject: objet, // Subject line
     text: msg, // plain text body
     html: msg, // html body
@@ -57,7 +57,10 @@ var notifmsg = '';
     sftp_util.get_file_from_pep_ts_sftp(remotePath, remotePathBackup, __dirname + '/../public/offres/last-import-from-ts-pep.csv', function (callback) {
       console.log('resultat de pep2pe = ' + callback);
       notifmsg = callback;
-      sendnotif('Import de l\'export TS', notifmsg);
+      notifmsg += '\r\nPour télécharger le fichier qui a été récupéré sur le FTP Talentsoft et comprennant les offres avant traitement';
+      notifmsg += '\r\ncliquez ici : https://place-emploi-public-api.osc-fr1.scalingo.io/offres/last-import-from-ts-pep.csv ';
+
+      sendnotif('🧲 Import de l\'export TalentSoft', notifmsg);
     });
 
   }, null, true, 'Europe/Paris');
@@ -67,7 +70,9 @@ var notifmsg = '';
     var tmp = pep2pe.pep2pe('', '', function (callback) {
       console.log('resultat de pep2pe = ' + callback);
       notifmsg = callback;
-      sendnotif('PEP2PE : import depuis TS', notifmsg);
+      notifmsg += '\r\nPour télécharger le fichier qui sera envoyé à Pôle emploi';
+      notifmsg += '\r\ncliquez ici : https://place-emploi-public-api.osc-fr1.scalingo.io/offres/last-export-to-pe.csv ';
+      sendnotif('🛠 Conversion des offres PEP dans le format Pôle emploi', notifmsg);
     });
   }, null, true, 'Europe/Paris');
 
@@ -75,8 +80,12 @@ var notifmsg = '';
     console.log('job3 sendtopeandnotif' + Date());
     var tmp = send2pe.send2pe(function (callback) {
       console.log('resultat de pep2pe = ' + callback);
-      notifmsg = callback;
-      sendnotif('PEP2PE : envoi sur PE des offres', notifmsg);
+      notifmsg = '✅';
+      notifmsg += callback;
+      notifmsg += '\r\nAttention, ce n\'est pas parce que le fichier a été envoyé qu\'il a été correctement traité par Pôle emploi';
+      notifmsg += '\r\npour connaitre l\'intégration effective des offres, rendez-vous sur https://www.portail-emploi.fr/portail-tap' ;
+
+      sendnotif('🚀 Envoi sur PE des offres', notifmsg);
     });
     
   }, null, true, 'Europe/Paris');

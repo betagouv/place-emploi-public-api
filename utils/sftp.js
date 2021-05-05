@@ -27,7 +27,7 @@ module.exports = {
       })
       .then(() => {
         //console.log('get_file_from_pep_ts_sftp : Reception du fichier ok');
-        if(callback) callback('Reception du fichier '+remotePath + ' ok. Enregistrement dans '+localPath + ' pour export (à venir) PE OK')
+        if(callback) callback('✅ Reception du fichier '+remotePath + ' ok. \r\nEnregistrement dans '+localPath + ' pour export (à venir) sur pôle emploi OK\r\n')
         sftp.end();
       })
       .catch(err => {
@@ -36,13 +36,13 @@ module.exports = {
         sftp.get(remotePathBackup, dst).then(() => {
           
           //console.log('get_file_from_pep_ts_sftp : Reception du fichier de BACKUP ok');
-          if(callback) callback('Fichier du jours absent. Reception du fichier de la veille '+remotePathBackup + ' OK. Enregistrement dans '+localPath + ' pour export PE (à venir)OK')
+          if(callback) callback('Fichier du jours absent. ✅  Reception du fichier de la veille '+remotePathBackup + ' OK. Enregistrement dans '+localPath + ' pour export PE (à venir)OK')
 
           sftp.end();
         })
         .catch(err => {
           console.error(err.message);
-          if(callback) callback('Erreur de récupérationdu fichier du jours. Echec de la tentative de récupération du fichier de la veille : '+err.message);
+          if(callback) callback('❌ Erreur de récupérationdu fichier du jours. Echec de la tentative de récupération du fichier de la veille : '+err.message);
 
   
         });
