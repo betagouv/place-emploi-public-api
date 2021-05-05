@@ -57,23 +57,12 @@ module.exports = {
             var i = 0;
 
             for (i = 0; i < offresPEP.length; i++) {
-                //var data = new FormData();
 
                 /// console.log("Traitement de OfferID = " + offresPEP[i].OfferID); // 527929
                 // mise en majuscule du libellé du métier et suppréssion des parenthèses . 
                 // Responsable des études et applications (FPT - A7A/08) => RESPONSABLE DES ÉTUDES ET APPLICATIONS
                 var Libelle_metier_pep = offresPEP[i].JobDescription_PrimaryProfile_.toUpperCase().replace(/ *\([^)]*\) */g, "");
                 ///  console.log('offre pe Par_ref_offre============== 👉');
-
-                //URL = concaténation de JobDescriptionTranslation_JobTitle (avec les espaces convertis en -) + la chaine de caractère «-référence-» + OfferID
-                //https://place-emploi-public.gouv.fr/offre-emploi/gestionnaire-sharepoint-et-serveurs-hf-reference-2021-531419/
-
-
-                //var tmp_url = accents.remove(offresPEP[i].JobDescriptionTranslation_JobTitle).toLowerCase().replaceAll(/ |\'/g, '-').replaceAll('/', '').replaceAll('|', '');
-                //tmp_url = 'https://place-emploi-public.gouv.fr/offre-emploi/' + tmp_url.replaceAll(/\(|\)|\.|\,|\«|\»|\"|\°/g, '').replace(/(\r\n|\n|\r)/gm, '') + '-reference-' + offresPEP[i].Offer_Reference_;
-                /// console.log('👍 NEW URL2= ' + tmp_url);
-
-
              //console.log('Libelle_metier_pep = ' + Libelle_metier_pep);
 
                 var tmp_rime_rome_match = export_rime_rome.rime_rome.find(metier => metier.lib_rime == Libelle_metier_pep);
@@ -88,7 +77,7 @@ module.exports = {
                     }
 
                     if (offresPEP[i].JobDescriptionTranslation_Description1_.length > 4800) {
-                          console.log('🪚 on coupe a 4800 caractère le descriptif');
+                          console.log('🪚 on coupe à 4800 caractère le descriptif');
                         offresPEP[i].JobDescriptionTranslation_Description1 = offresPEP[i].JobDescriptionTranslation_Description1.substring(0, 4799);
                     }
 
