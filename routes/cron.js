@@ -90,11 +90,7 @@ var notifmsg = '';
     
   }, null, true, 'Europe/Paris');
 
-  var testcron = new CronJob('* */10 * * * *', function () {
-    console.log('👉 Cron is running ' + Date());
-    
-  }, null, true, 'Europe/Paris');
-  
+
   
   get_ts_file.start();
   pepconversionpe.start();
