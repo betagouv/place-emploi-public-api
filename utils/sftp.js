@@ -31,7 +31,7 @@ module.exports = {
         sftp.end();
       })
       .catch(err => {
-        console.error(err.message);
+        console.log(err.message);
         //console.log('get_file_from_pep_ts_sftp : Reception du fichier ko. Tenative de récuperation de fichier de la veille ='+remotePathBackup);
         sftp.get(remotePathBackup, dst).then(() => {
           
@@ -41,7 +41,7 @@ module.exports = {
           sftp.end();
         })
         .catch(err => {
-          console.error(err.message);
+          console.log(err.message);
           if(callback) callback('❌ Erreur de récupérationdu fichier du jours. Echec de la tentative de récupération du fichier de la veille : '+err.message);
 
   
