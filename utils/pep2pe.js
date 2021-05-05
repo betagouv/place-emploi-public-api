@@ -39,7 +39,7 @@ module.exports = {
     else {
         talentsoft_export_file = 'last-import-from-ts-pep.csv'; //'export_offres_PEP_07avril2021.csv'
     }
-    console.log('[pep2pe] : import du fichier :'+talentsoft_export_file);
+    //console.log('[pep2pe] : import du fichier :'+talentsoft_export_file);
     fs.createReadStream(__dirname + '/../public/offres/' + talentsoft_export_file)
         .on('error', function (err) {
             //res.status(500);
@@ -48,12 +48,12 @@ module.exports = {
         })
         .pipe(csv({ 'separator': ';' ,'escape' : '"'}))
         .on('headers', (headers) => {
-            console.log(`👉 First header: ${headers[0]}`)
+            //console.log(`👉 First header: ${headers[0]}`)
           })
         .on('data', (data) => offresPEP.push(data))
         .on('end', () => {
 
-            console.log("🔎 Nombres de lignes importées: " + offresPEP.length);
+            //console.log("🔎 Nombres de lignes importées: " + offresPEP.length);
             var i = 0;
 
             for (i = 0; i < offresPEP.length; i++) {
@@ -77,7 +77,7 @@ module.exports = {
                     }
 
                     if (offresPEP[i].JobDescriptionTranslation_Description1_.length > 4800) {
-                          console.log('🪚 on coupe à 4800 caractère le descriptif');
+                        //console.log('🪚 on coupe à 4800 caractère le descriptif');
                         offresPEP[i].JobDescriptionTranslation_Description1 = offresPEP[i].JobDescriptionTranslation_Description1.substring(0, 4799);
                     }
 
