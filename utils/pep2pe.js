@@ -5,7 +5,7 @@ const csv = require('csv-parser');
 //var axios = require('axios');
 const fs = require('fs');
 var accents = require('remove-accents');
-let export_rime_rome = require('./rime_rome.js');
+let export_rime_rome = require('./rmfp_rome.js');
 var now = new Date();
 
 
