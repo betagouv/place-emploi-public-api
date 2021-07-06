@@ -68,7 +68,7 @@ module.exports = {
                 ///  console.log('offre pe Par_ref_offre============== 👉');
              //console.log('Libelle_metier_pep = ' + Libelle_metier_pep);
 
-                var tmp_rime_rome_match = export_rime_rome.rime_rome.find(metier => metier.lib_rime == Libelle_metier_pep);
+                var tmp_rime_rome_match = export_rime_rome.rmfp_rome.find(metier => metier.lib_rmfp == Libelle_metier_pep);
                 if (tmp_rime_rome_match) {
 
                     offresPEP[i].JobDescriptionTranslation_Description1_ = offresPEP[i].JobDescriptionTranslation_Description1_.replace(/(\r\n|\n|\r)/gm, "\\n").replaceAll('|', '');
