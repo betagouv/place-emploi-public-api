@@ -5,13 +5,13 @@ const csv = require('csv-parser');
 //var axios = require('axios');
 const fs = require('fs');
 var accents = require('remove-accents');
-let export_rime_rome = require('./rmfp_rome.js');
+let export_rmfp_rome = require('./rmfp_rome.js');
 var now = new Date();
 
 
 module.exports = {
 //pep2pe prend en entré un fichier d'export d'offre de pep au format talentsoft
-//ensuite, on ne prend que les offres qui sont dans le référentiel rime_rome (/rime_rome.js)
+//ensuite, on ne prend que les offres qui sont dans le référentiel rmfp_rome (/rmfp_rome.js)
 //on supprimer les offres qui on un descriptif trop court, etc
 //ensuite il le converti dans un format "pole emploi"
   pep2pe : function(pepfile, pefile,callback){
@@ -68,8 +68,8 @@ module.exports = {
                 ///  console.log('offre pe Par_ref_offre============== 👉');
              //console.log('Libelle_metier_pep = ' + Libelle_metier_pep);
 
-                var tmp_rime_rome_match = export_rime_rome.rmfp_rome.find(metier => metier.lib_rmfp == Libelle_metier_pep);
-                if (tmp_rime_rome_match) {
+                var tmp_rmfp_rome_match = export_rmfp_rome.rmfp_rome.find(metier => metier.lib_rmfp == Libelle_metier_pep);
+                if (tmp_rmfp_rome_match) {
 
                     offresPEP[i].JobDescriptionTranslation_Description1_ = offresPEP[i].JobDescriptionTranslation_Description1_.replace(/(\r\n|\n|\r)/gm, "\\n").replaceAll('|', '');
                     //console.log( "😱"+offresPEP[i].JobDescriptionTranslation_Description1_+" > "+offresPEP[i].JobDescriptionTranslation_Description1_.length );
@@ -100,7 +100,7 @@ module.exports = {
                         OfferID: offresPEP[i].Offer_Reference_,
                         Offer_Reference_: offresPEP[i].Offer_Reference_,
                         iteration: i,
-                        code_ogr: tmp_rime_rome_match.code_ogr,
+                        code_ogr: tmp_rmfp_rome_match.code_ogr,
                         description: offresPEP[i].JobDescriptionTranslation_Description1_,
                         Description_entreprise :  offresPEP[i].Origin_Entity_                   
                     };
@@ -131,10 +131,10 @@ module.exports = {
                 }
             }           
                 /// console.log('écriture fichier');
-              //  res.send("<h1>" + offresPEP.length + " offres importées depuis PEP / " + nb_offres_export + " avec correspondanc RIME-ROME  (" + Math.round(eval((nb_offres_export * 100) / offresPEP.length)) + "%) / " + nb_offres_url + "  offres dispo pour l'import sur le site de PE</h1>");
+              //  res.send("<h1>" + offresPEP.length + " offres importées depuis PEP / " + nb_offres_export + " avec correspondanc RMFP-ROME  (" + Math.round(eval((nb_offres_export * 100) / offresPEP.length)) + "%) / " + nb_offres_url + "  offres dispo pour l'import sur le site de PE</h1>");
               stream.end();
-              if(callback) callback( "✅ " + offresPEP.length + " offres importées depuis PEP / " + nb_offres_export + " avec correspondanc RIME-ROME  (" + Math.round(eval((nb_offres_export * 100) / offresPEP.length)) + "%) / " + nb_offres_url + "  offres dispo pour l'import sur le site de PE \r\n");
-              return   "" + offresPEP.length + " offres importées depuis PEP / " + nb_offres_export + " avec correspondanc RIME-ROME  (" + Math.round(eval((nb_offres_export * 100) / offresPEP.length)) + "%) / " + nb_offres_url + "  offres dispo pour l'import sur le site de PE";
+              if(callback) callback( "✅ " + offresPEP.length + " offres importées depuis PEP / " + nb_offres_export + " avec correspondanc RMFP-ROME  (" + Math.round(eval((nb_offres_export * 100) / offresPEP.length)) + "%) / " + nb_offres_url + "  offres dispo pour l'import sur le site de PE \r\n");
+              return   "" + offresPEP.length + " offres importées depuis PEP / " + nb_offres_export + " avec correspondanc RMFP-ROME  (" + Math.round(eval((nb_offres_export * 100) / offresPEP.length)) + "%) / " + nb_offres_url + "  offres dispo pour l'import sur le site de PE";
         });   
 }
 
