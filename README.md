@@ -25,6 +25,6 @@ Le site est accessible à l'adresse : `http://localhost:3000/`
 
 Seul les offres d'emploi listées dans le fichier [rime_rome.js](routes/utils/rime_rome.js) sont envoyées à pôle emploi.
 
-Un metier (lib_rime) absent de ce fichier ne sera jamais envoyé sur pôle emploi. Pour ajouter un métlier, il faut connaitre le libélé rime exact, et le code rome (code_ogr) associé.
+Un metier (lib_rmfp) absent de ce fichier ne sera jamais envoyé sur pôle emploi. Pour ajouter un métlier, il faut connaitre le libélé rime exact, et le code rome (code_ogr) associé.
   
 
